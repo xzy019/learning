@@ -1,30 +1,30 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
   <router-view/>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import {defineComponent, ref, reactive, toRefs} from 'vue'
+export default defineComponent({
+  components: {
 
-#nav {
-  padding: 30px;
-}
+  },
+  setup(props, ctx){
+    let color_one = ref('#2E4E7E');
+    let color_two = ref('#284090');
+    let color_three = ref('#184088');
+    let color_red = ref('#E01008');
+    return{
+      color_one,
+      color_two,
+      color_three,
+      color_red
+    }
+  }
+})
+</script>
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+<style scoped>
+#nav{
+  color: v-bind(color_one);
 }
 </style>
