@@ -6,6 +6,8 @@ import ElementPlus from 'element-plus';
 import 'element-plus/lib/theme-chalk/index.css';
 import axios from 'axios';
 import swal from 'sweetalert2';
+import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/all.js';
  
 const app = createApp(App);
 app.config.globalProperties.$axios = axios;
