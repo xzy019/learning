@@ -3,7 +3,7 @@
     <transition v-show="awidth">
       <el-aside width="300px">
         <div class="top">
-          <img class="el-avatar" src="../assets/logo.png" />
+          <img class="el-avatar" :src="imgUrl" />
           <p>
             <i 
               v-if="sex==='男'"
@@ -71,7 +71,13 @@
     </transition>
     <el-main>
       <div class="main_header">
-        <Button :bcolor="'#7397AB'" :msg="''" :icon="'fa fa-bars'" @click="showBar()"/>
+        <div class="main_header_left">
+          <Button :bcolor="'#7397AB'" :msg="''" :icon="'fa fa-bars'" @click="showBar()"/>
+        </div>
+        <div class="main_header_right">
+          <input type="text" v-model="search_text">
+          <button @click="search()"><i class="fa fa-search"></i></button>
+        </div>
       </div>
       <div class="main_body">
         <router-view />
@@ -95,7 +101,9 @@ export default defineComponent({
     let num = ref(5);
     let bgcolor = ref('#e6e6e6');
     let username = ref("Li Ming");
-    let sex = ref("女");
+    let sex = ref("男");
+    let imgUrl = ref(require('../assets/logo.png'));
+    let search_text = ref('');
     let list = reactive([
       {
         path:'/self',
@@ -130,6 +138,14 @@ export default defineComponent({
       num.value = index;
       bgcolor.value = list[index].color;
     }
+    let search = ()=>{
+      this.$axios({
+        url:'',
+        param:{
+          text: search_text.value
+        }
+      })
+    }
     return{
       awidth,
       showBar,
@@ -138,7 +154,9 @@ export default defineComponent({
       num,
       bgcolor,
       username,
-      sex
+      sex,
+      imgUrl,
+      search_text
     }
   }
 })
@@ -151,14 +169,15 @@ export default defineComponent({
   height: 100vh;
   border-radius: 15px;
   margin: 0;
-  overflow: hidden;
   background-color: #fff;
 }
 .el-aside{
   border-right: 1px solid v-bind(bgcolor);
+  overflow: hidden;
 }
 .el-main{
   border-left: 1px solid v-bind(bgcolor);
+  overflow-x: scroll;
 }
 .center{
   width: 100%;
@@ -174,7 +193,7 @@ export default defineComponent({
   height: 30px;
   padding-top: 12px;
   padding-bottom: 12px;
-  padding-left: 12px;
+  padding-left: 30px;
   background-color: transparent;
   position: relative;
   line-height: 30px;
@@ -282,4 +301,52 @@ export default defineComponent({
   margin-left: 5px;
 }
 
+.main_header{
+  width: 100%;
+  height: 40px;
+  border-bottom: 1px solid #e6e6e6;
+  position: relative;
+}
+.main_header_left{
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-block;
+}
+.main_header_right{
+  position: absolute;
+  right: 0px;
+  top: 5px;
+  display: inline-block;
+}
+.main_header_right input{
+  border-radius: 12px 0 0 12px;
+  width: 190px;
+  height: 20px;
+  border-right: none;
+  border-top: 2px solid #7397ab;
+  border-left: 2px solid #7397ab;
+  border-bottom: 2px solid #7397ab;
+  outline: none;
+  text-indent: 10px;
+}
+.main_header_right button{
+  border-radius: 0 12px 12px 0;
+  border-left: none;
+  height: 26px;
+  background-color: transparent;
+  border-top: 2px solid #7397ab;
+  border-right: 2px solid #7397ab;
+  border-bottom: 2px solid #7397ab;
+  color: #7397ab;
+}
+.main_header_right button:hover{
+  cursor: pointer;
+  background-color: #7397ab;
+  color: white;
+}
+
+.main_body{
+  padding-top: 10px;
+}
 </style>

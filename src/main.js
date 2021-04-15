@@ -8,12 +8,19 @@ import axios from 'axios';
 import swal from 'sweetalert2';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
+import * as echarts from 'echarts'
+import '@icon-park/vue-next/styles/index.css';
  
 const app = createApp(App);
-app.config.globalProperties.$axios = axios;
-app.config.globalProperties.$swal = swal;
 
 app.use(ElementPlus)
 app.use(store)
 app.use(router)
 app.mount('#app')
+
+app.config.globalProperties.$axios = axios;
+app.config.globalProperties.$swal = swal;
+app.config.globalProperties.$echarts = echarts;
+
+
+

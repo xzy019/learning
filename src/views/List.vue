@@ -1,5 +1,5 @@
 <template>
-
+vue/list
 </template>
 
 <script>
