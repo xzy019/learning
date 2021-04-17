@@ -1,6 +1,7 @@
 <template>
   <div id="main"></div>
   <div id="studyTable">
+    <el-button type="success" icon="el-icon-plus" @click="dialogFormVisible = true"></el-button>
     <el-table :data="StudyData" style="width: 100%">
       <el-table-column label="学习时间" width="180">
         <template #default="scope">
@@ -24,12 +25,33 @@
       </el-table-column>
     </el-table>
   </div>
+
+  <el-dialog title="新增学习记录" v-model="dialogFormVisible">
+  <el-form :model="addStudy">
+    <el-form-item label="学习时间" :label-width="formLabelWidth">
+      <el-input v-model="addStudy.StudyTime" style="width:220px" autocomplete="off" placeholder="请输入学习时间"></el-input>
+      分钟
+    </el-form-item>
+    <el-form-item label="记录类型" :label-width="formLabelWidth">
+      <el-select v-model="addStudy.Type" placeholder="请选择记录类型">
+        <el-option label="前端" value="前端"></el-option>
+        <el-option label="后端" value="后端"></el-option>
+        <el-option label="大数据" value="大数据"></el-option>
+        <el-option label="人工智能" value="人工智能"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <template #footer>
+    <span class="dialog-footer">
+      <el-button @click="dialogFormVisible = false">取 消</el-button>
+      <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+    </span>
+  </template>
+  </el-dialog>
 </template>
 
 <script>
 import { defineComponent, ref, reactive, toRefs } from "vue";
-import * as echarts from "echarts";
-import { color } from "echarts";
 export default defineComponent({
   name: "",
   components: {},
@@ -51,6 +73,10 @@ export default defineComponent({
         Type: '学习'
       }
     ]);
+    let addStudy = reactive({
+      StudyTime:'',
+      Type: ''
+    })
     let handleEdit = (index,row)=>{
       console.log(index,row);
     }
@@ -60,7 +86,9 @@ export default defineComponent({
     return {
       StudyData,
       handleEdit,
-      handleDelete
+      handleDelete,
+      dialogFormVisible: ref(false),
+      addStudy
     };
   },
   mounted(){

@@ -177,7 +177,7 @@ export default defineComponent({
 }
 .el-main{
   border-left: 1px solid v-bind(bgcolor);
-  overflow-x: scroll;
+  overflow-y: scroll;
 }
 .center{
   width: 100%;
