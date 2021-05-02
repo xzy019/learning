@@ -1,7 +1,7 @@
 <template>
   <div id="main"></div>
   <div id="studyTable">
-    <el-button type="success" icon="el-icon-plus" @click="dialogFormVisible = true"></el-button>
+    <el-button type="success" icon="el-icon-plus" @click="dialogFormVisible = true;addedit = '新增学习记录'"></el-button>
     <el-table :data="StudyData" style="width: 100%">
       <el-table-column label="学习时间" width="180">
         <template #default="scope">
@@ -26,7 +26,7 @@
     </el-table>
   </div>
 
-  <el-dialog title="新增学习记录" v-model="dialogFormVisible">
+  <el-dialog :title="addedit" v-model="dialogFormVisible">
   <el-form :model="addStudy">
     <el-form-item label="学习时间" :label-width="formLabelWidth">
       <el-input v-model="addStudy.StudyTime" style="width:220px" autocomplete="off" placeholder="请输入学习时间"></el-input>
@@ -59,36 +59,49 @@ export default defineComponent({
     let StudyData = reactive([
       {
         ID:0,
-        StudyTime:'25',
-        Type: '学习'
+        StudyTime:'40',
+        Type: '前端'
       },
       {
         ID:1,
         StudyTime:'20',
-        Type: '学习'
+        Type: '后端'
+      },
+      {
+        ID:2,
+        StudyTime:'36',
+        Type: '大数据'
       },
       {
         ID:3,
-        StudyTime:'45',
-        Type: '学习'
+        StudyTime:'10',
+        Type: '人工智能'
       }
     ]);
     let addStudy = reactive({
       StudyTime:'',
       Type: ''
-    })
+    });
+    let addedit = ref("");
+    let dialogFormVisible = ref(false);
     let handleEdit = (index,row)=>{
+      addedit.value = "编辑学习记录";
+      dialogFormVisible.value = true;
       console.log(index,row);
+      addStudy.StudyTime = row.StudyTime;
+      addStudy.Type = row.Type;
     }
     let handleDelete = (index,row)=>{
       console.log(index,row);
     }
+
     return {
       StudyData,
       handleEdit,
       handleDelete,
-      dialogFormVisible: ref(false),
-      addStudy
+      dialogFormVisible,
+      addStudy,
+      addedit
     };
   },
   mounted(){

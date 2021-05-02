@@ -7,11 +7,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue'),
     children:[
       {
-        path: '/login',
-        name: 'Login',
-        component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue')
-      },
-      {
         path: '/list',
         name: 'List',
         // route level code-splitting
@@ -36,6 +31,26 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/',
+    name: 'index',
+    redirect: '/login'
+  },
+  {
+    path:'/login',
+    name:'Login',
+    component: () => import(/* webpackChunkName: "login"*/ '../views/LoginRegister.vue')
+  },
+  {
+    path:'/:catchAll(.*)',
+    name:'/404',
+    component: () => import(/* webpackChunkName: "404"*/ '../views/404.vue')
+  },
+  {
+    path: '/edit',
+    name: 'Edit',
+    component: () => import(/* webpackChunkName: "edit" */ '../views/Edit.vue'),
+  }
   
 ]
 
