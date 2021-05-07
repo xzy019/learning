@@ -1,46 +1,75 @@
 <template>
-  <ul>
+  <ul v-if="xuanran">
     <li
       v-for="(item,index) of Note"
-      :key="index"
-      @click="findNote(item.ID)">
-      <h1>{{item.title}}</h1>
+      v-show="item.title"
+      :key="item.id"
+    >
+      <h1 @click="findNote(item.id)">{{item.title}}</h1>
       <el-tag type="danger">#后端</el-tag>
-      <p>{{ellipsis(item.content)}}</p>
+      <div @click="findNote(item.id)" style="height:70px">{{ellipsis(item.content)}}</div>
       <div class="bottom">
         <div class="left">
           <Time theme="outline" size="17" fill="#bebebe"/>
           {{item.time}}
         </div>
-        <div class="right" @click="dianzan(index)">
+        <div class="right" @click="dianzan(item.id,index)">
           <like v-show="!item.like" theme="filled" size="18" fill="#ff5964"/>
           <like v-show="item.like" theme="outline" size="18" fill="#333"/>
-          <span>{{item.likecount}}</span>
+          <span>{{item.likeNumber}}</span>
         </div>
       </div>
     </li>
   </ul>
+  <div>
+    <el-pagination
+      background
+      :current-page="page"
+      layout="prev, pager, next"
+      @current-change="change"
+      page-size="3"
+      :total="total">
+    </el-pagination>
+  </div>
 </template>
 
 <script>
 import {Time,Like} from '@icon-park/vue-next';
-import {defineComponent, ref, reactive, toRefs} from 'vue'
+import {defineComponent, ref, reactive, toRefs, getCurrentInstance} from 'vue'
+import NoteAPI from '../lib/API/NoteAPI'
+import swal from '../lib/swal'
 export default defineComponent({
   components:{
     Time,
     Like
   },
-  setup(props, ctx){
+  setup(props){
+    const {ctx} = getCurrentInstance();
     let Note = reactive([
       {
-        ID: 0,
-        title: '标题',
-        content:'测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试',
-        time:'2021-4-15 18:50',
-        likecount:1200,
+        id: 0,
+        title: '',
+        content: '',
+        time: '',
+        likeNumber: '',
         like: true
       }
     ]);
+    let xuanran = ref(false);
+    let page =ref(1);
+    let total = ref(10);
+    NoteAPI.getNoteTag('后端',page.value,3).then(res=>{
+      console.log(res.data.total);
+      total.value = res.data.total;
+      let i = 0;
+      for(i;i<res.data.data.length;i++){
+        Note[i] = res.data.data[i];
+        Note[i].like = true;
+        Note[i].time = res.data.data[i].time.replace(/T/g, ' ').replace(/.[\d]{3}Z/, ' ');
+      }
+      console.log(Note);
+      xuanran.value = true;
+    })
     let ellipsis = (value)=>{
       if (!value) return "";
       if (value.length > 220) {
@@ -51,28 +80,56 @@ export default defineComponent({
 
     let findNote = (index)=>{
       console.log(index);
+      let see = ctx.$router.resolve({
+        path: `/see/${index}`,
+      });
+      window.open(see.href, '_blank')
     };
-    let dianzan = (index)=>{
+    let dianzan = (row,index)=>{
       if(Note[index].like===true){
-        Note[index].likecount++;
+        Note[index].likeNumber++;
         Note[index].like = !Note[index].like;
+        NoteAPI.likeNote(row).then(res=>{
+          console.log(res);
+          if(res.data.code === 200) swal.Success('点赞成功');
+        })
       }
       else{
         Note[index].likecount--;
         Note[index].like = !Note[index].like;
       }
+    };
+    let change = function(index){
+      NoteAPI.getNoteTag('后端',index,3).then(res=>{
+        let i = 0;
+        for(i;i<3;i++){
+          if(res.data.data[i] == null) Note[i] = {
+            id: 0,
+            title: '',
+            content: '',
+            time: '',
+            likeNumber: '',
+            like: true,
+          };
+          else{
+            Note[i] = res.data.data[i];
+            Note[i].like = true;
+            Note[i].time = res.data.data[i].time.replace(/T/g, ' ').replace(/.[\d]{3}Z/, ' ');
+          } 
+        }
+        console.log(Note);
+        xuanran.value = true;
+      })
     }
     return{
       Note,
       dianzan,
       ellipsis,
-      findNote
-    }
-  },
-  filters: {
-    //超过20位显示 ...
-    ellipsis: function(value) {
-      
+      findNote,
+      total,
+      xuanran,
+      page,
+      change
     }
   },
 })
@@ -84,7 +141,7 @@ ul{
 }
 li{
   width: 60vw;
-  height: 240px;
+  height: 195px;
   border: 1px solid #e6e6e6;
   padding: 12px;
   border-radius: 4px;

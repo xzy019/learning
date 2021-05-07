@@ -14,7 +14,7 @@
       <el-input v-model="User.id"></el-input>
     </el-form-item>
     <el-form-item label="密码">
-      <el-input v-model="User.password"></el-input>
+      <el-input type="password" v-model="User.password"></el-input>
     </el-form-item>
     <el-form-item label="验证码">
       <el-input v-model="yzm" style="width: 50%"></el-input>
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import swal from '../lib/swal';
+import axios from 'axios';
 export default {
   components: {},
   data() {
@@ -38,11 +40,32 @@ export default {
         type: "",
       },
       yzm: "",
+      code: ''
     };
   },
   methods: {
     onSubmit() {
-      console.log(this.User);
+      if(this.yzm.toUpperCase === this.code.toUpperCase){
+        axios({
+          url: 'http://localhost:6060/api/Authoize/Login',
+          method: 'post', // post、put、delete、
+          params: {
+            username: this.User.id,
+            userpwd: this.User.password
+          },
+        })
+        .then(function (response) {
+          console.log(response.data);
+          sessionStorage.setItem("token",response.data.data);
+          this.$router.push({
+            path: '/home'
+          });
+        }.bind(this))
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      }else swal.Warning("输入的验证码有误");
     },
     getCode() {
       var code = "";

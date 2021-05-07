@@ -8,25 +8,49 @@
     <span v-show="item.level===2" style="color:#a2d5f2">!!!</span>
     <span v-show="item.level===1" style="color:#ffda77">!!</span>
     <span v-show="item.level===0" style="color:#1bd1a5">!</span>
-    <el-checkbox v-model="item.complete" :disabled="item.complete" @click="comp(item.id)">{{item.title}}</el-checkbox>
+    <el-checkbox v-show="!item.complete" v-model="item.complete" :disabled="item.complete" @click="comp(item.id)">{{item.title}}</el-checkbox>
+    <el-checkbox v-show="item.complete" v-model="item.complete" :disabled="item.complete">{{item.title}}</el-checkbox>
   </li>
 </ul>
 </template>
 
 <script>
-import {defineComponent, ref, reactive, toRefs, onMounted} from 'vue'
 import List from '../lib/API/ListAPI'
 import swal from '../lib/swal'
-export default defineComponent({
+export default({
   name: '',
   components: {
 
   },
   props:{
   },
-  setup(props, ctx){
-    let list = reactive([]);
-    let comp = (index)=>{
+  data(){
+    return{
+      list: [],
+      loading: true
+    }
+  },
+  created(){
+    List.getList(1,10).then(res=>{
+      console.log(res);
+      res.data.data.sort(function(a, b){return a.complete - b.complete});
+      res.data.data.sort(function(a, b){return b.level - a.level});
+      for (var i = 0; i < res.data.data.length; i++) {
+        if(res.data.data[i].level === 0){
+          var newObject = {};
+          newObject = res.data.data[i];
+          newObject.complete = Boolean(res.data.data[i].complete);
+          newObject.id = res.data.data[i].id;
+          newObject.level = res.data.data[i].level;
+          newObject.title = res.data.data[i].title;
+          this.list.push(newObject);
+        }
+      }
+      this.loading = false;
+    });
+  },
+  methods: {
+    comp:function(index){
       List.editList(index).then(res=>{
         if(res.data.code === 200){
           swal.Success('已完成');
@@ -38,27 +62,9 @@ export default defineComponent({
             list[i].title = res.data.data[i].title;
           }
         })
-        }
-      })
-    }
-    let loading = ref(true);
-    List.getList(1,10).then(res=>{
-      console.log(res);
-      res.data.data.sort(function(a, b){return a.complete - b.complete});
-      res.data.data.sort(function(a, b){return b.level - a.level});
-      for(var i = 0;i<res.data.data.length;i++){
-
-        list[i] = res.data.data[i];
-        list[i].complete = Boolean(res.data.data[i].complete);
-        list[i].title = res.data.data[i].title;
       }
-      loading.value = false;
     })
-    
-    return{
-      list,
-      comp
-    }
+  },
   }
 })
 </script>

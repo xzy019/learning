@@ -1,4 +1,4 @@
-# learning
+# learning-front 毕业设计
 
 ## Project setup
 ```

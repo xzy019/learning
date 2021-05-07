@@ -26,6 +26,13 @@ export default defineComponent({
     let title = ref("");
     let text = ref("");
     let tag = ref("");
+    let noteid = ctx.$router.currentRoute.value.params.Id;
+    Note.getNoteID(noteid).then(res=>{
+      title.value = res.data.data[0].title;
+      text.value = res.data.data[0].content;
+      tag.value = res.data.data[0].tag;
+      console.log(title.value,text.value,tag.value);
+    })
     let handleUploadImage = (event, insertImage, file)=>{
       // 拿到 files 之后上传到文件服务器，然后向编辑框中插入对应的内容
       console.log(file[0]);
@@ -40,7 +47,7 @@ export default defineComponent({
       .then(function (response) {
         console.log(response);
         insertImage({
-          url: response.data.data,
+          url: response.data,
           desc: file[0].name,
         });
       })
@@ -49,12 +56,13 @@ export default defineComponent({
       });
       
     };
+    
     let saveText = (text, html)=>{
       console.log(text, html, title.value, tag.value);
-      Note.createNote(title.value,text,tag.value)
+      Note.editNote(noteid,title.value,text,tag.value)
       .then(res=>{
         if(res.data.code === 200)
-        swal.Success("发布成功");
+        swal.Success("修改成功");
         ctx.$router.push({
           path: '/home'
         })

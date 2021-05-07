@@ -5,7 +5,6 @@ import store from './store'
 import ElementPlus from 'element-plus';
 import 'element-plus/lib/theme-chalk/index.css';
 import axios from 'axios';
-import swal from 'sweetalert';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 import * as echarts from 'echarts'
@@ -26,7 +25,6 @@ VueMarkdownEditor.use(vuepressTheme,createLineNumbertPlugin());
 const app = createApp(App);
 
 app.config.globalProperties.$axios = axios;
-app.config.globalProperties.$swal = swal;
 app.config.globalProperties.$echarts = echarts;
 
 app.use(ElementPlus);

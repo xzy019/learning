@@ -2,16 +2,26 @@
   <el-tabs type="border-card" :tab-position="tabPosition" style="height: 80vh">
     <el-tab-pane label="全部">
       <el-button @click="dialog = true" type="warning" icon="el-icon-plus" circle></el-button>
-      <List />
+      <List/>
     </el-tab-pane>
     <el-tab-pane label="未完成">
-      <List />
+      <list-complete/>
     </el-tab-pane>
-    <el-tab-pane label="已完成"></el-tab-pane>
-    <el-tab-pane label="优先级为3"></el-tab-pane>
-    <el-tab-pane label="优先级为2"></el-tab-pane>
-    <el-tab-pane label="优先级为1"></el-tab-pane>
-    <el-tab-pane label="优先级为0"></el-tab-pane>
+    <el-tab-pane label="已完成">
+      <list-completed/>
+    </el-tab-pane>
+    <el-tab-pane label="优先级为3">
+      <list-3/>
+    </el-tab-pane>
+    <el-tab-pane label="优先级为2">
+      <list-2/>
+    </el-tab-pane>
+    <el-tab-pane label="优先级为1">
+      <list-1/>
+    </el-tab-pane>
+    <el-tab-pane label="优先级为0">
+      <list-0/>
+    </el-tab-pane>
   </el-tabs>
 
   <el-drawer title="新增计划" size="30%"
@@ -37,7 +47,7 @@
       <div class="demo-drawer__footer" style="padding-left:90px">
         <el-button @click="cancelForm()">取 消</el-button>
         <el-button
-          type="primary"
+          type="primary" @click="submit"
           >确 定</el-button
         >
       </div>
@@ -48,34 +58,30 @@
 <script>
 import { defineComponent, ref, reactive, toRefs } from "vue";
 import List from "@/components/list.vue";
-import ListFrom from "@/components/ListFrom.vue";
+import ListComplete from "@/components/listComplete.vue"
+import ListCompleted from "@/components/listCompleted.vue"
+import List0 from "@/components/list0.vue"
+import List1 from "@/components/list1.vue"
+import List2 from "@/components/list2.vue"
+import List3 from "@/components/list3.vue"
+import ListAPI from '../lib/API/ListAPI'
+import swal from '../lib/swal'
 export default defineComponent({
   name: "",
   components: {
     List,
-    ListFrom,
+    ListComplete,
+    ListCompleted,
+    List0,
+    List1,
+    List2,
+    List3,
   },
   setup(props, ctx) {
+    let list = reactive([]);
     let timer = ref(null);
     let loading = ref(false);
     let dialog = ref(false);
-    // let handleClose = (done)=> {
-    //   if (loading.value) {
-    //     return;
-    //   }
-    //   this.$confirm('确定要提交表单吗？')
-    //     .then(()=> {
-    //       loading.value = true;
-    //       timer.value = setTimeout(() => {
-    //         done();
-    //         // 动画关闭需要一定的时间
-    //         setTimeout(() => {
-    //           loading.value = false;
-    //         }, 400);
-    //       }, 2000);
-    //     })
-    //     .catch(()=> {});
-    // }
     let cancelForm = ()=> {
       loading.value = false;
       dialog.value = false;
@@ -84,14 +90,25 @@ export default defineComponent({
     let listone = reactive({
       addtitle:'',
       addlevel: 0
-    })
+    });
+    let submit = ()=>{
+      ListAPI.createList(listone.addtitle, listone.addlevel).then(res=>{
+        console.log(res);
+        if(res.data.code === 200){
+          swal.Success('创建成功');
+          dialog.value = false;
+           location. reload()
+        }
+      })
+    }
     return {
       tabPosition: ref("left"),
       cancelForm,
       dialog,
       loading,
       listone,
-      timer
+      timer,
+      submit
     };
   },
 });

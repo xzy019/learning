@@ -3,15 +3,15 @@
     status-icon
     :model="writer"
     :rules="rule"
-    ref="Counsellor"
+    ref="writer"
     label-width="100px"
     class="demo-ruleForm"
   >
     <el-form-item label="用户昵称" prop="nickname">
-      <el-input v-model="writer.name"></el-input>
+      <el-input v-model="writer.nickname"></el-input>
     </el-form-item>
-    <el-form-item label="用户名" prop="name">
-      <el-input v-model="writer.name"></el-input>
+    <el-form-item label="用户名" prop="username">
+      <el-input v-model="writer.username"></el-input>
     </el-form-item>
     <el-form-item label="密码" prop="pass">
       <el-input
@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import swal from '../lib/swal'
 export default {
   components: {},
   data() {
@@ -51,8 +53,8 @@ export default {
         if (value === '') {
           callback(new Error('请输入密码'));
         } else {
-          if (this.Counsellor.checkPass !== '') {
-            this.$refs.Counsellor.validateField('checkPass');
+          if (this.writer.checkPass !== '') {
+            this.$refs.writer.validateField('checkPass');
           }
           callback();
         }
@@ -60,7 +62,7 @@ export default {
       var validatePass2 = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请再次输入密码'));
-        } else if (value !== this.Counsellor.pass) {
+        } else if (value !== this.writer.pass) {
           callback(new Error('两次输入密码不一致!'));
         } else {
           callback();
@@ -76,16 +78,18 @@ export default {
         checkPass: '',
       },
       rule: {
-        name: [
-          { required: true, message: '请输入真实姓名', trigger: 'blur' },
-          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' },
-          {
-            required: true,
-            pattern: /^[\u4e00-\u9fa5_a-zA-Z0-9.·-]+$/,
-            message: '姓名不支持特殊字符',
-            trigger: 'blur'
-          }
+        nickname: [
+          // { required: true, message: '请输入真实姓名', trigger: 'blur' },
+          // { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' },
+          // {
+          //   required: true,
+          //   pattern: /^[\u4e00-\u9fa5_a-zA-Z0-9.·-]+$/,
+          //   message: '姓名不支持特殊字符',
+          //   trigger: 'blur'
+          // }
+          { required: true, message: '请输入用户昵称', trigger: 'blur' }
         ],
+        username:[{ required: true, message: '请输入用户名', trigger: 'blur' }],
         sex: [
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
@@ -95,7 +99,7 @@ export default {
         checkPass: [
           { required: true, validator: validatePass2, trigger: 'blur' }
         ],
-        phoneNumber:[
+        telnumber:[
           { required: true, message: '请输入电话号码', trigger: 'blur' }, 
           { required: true, pattern: /^((13|14|15|16|17|18)[0-9]{1}\d{8})|((166|199|198)[0-9]{1}\d{7})$/, message: '请输入正确的电话号码', trigger: 'blur' }
         ]
@@ -106,7 +110,24 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          console.log(this.Counsellor);
+          axios({
+            url:"http://localhost:5000/api/Writer/Create",
+            method: 'post',
+            params:{
+              username: this.writer.username,
+              userpwd: this.writer.pass,
+              nickname: this.writer.nickname,
+              sex: this.writer.sex,
+              telnumber: this.writer.telnumber
+            }
+          }).then(function(res){
+            if(res.data.code ===200){
+              swal.Success("注册成功");
+              this.$router.go(0)
+            }
+          }.bind(this)).catch(err=>{
+            console.log(err)
+          })
         } else {
           console.log('error submit!!');
           return false;

@@ -4,7 +4,8 @@ function Success(text){
   Swal.fire({
     text: text,
     icon: 'success',
-    confirmButtonText: 'OK'
+    confirmButtonText: 'OK',
+    timer: 1000
   })
 }
 
@@ -24,7 +25,7 @@ function Error(){
   })
 }
 
-function DeleteAPI(dosomething){
+function DeleteAPI(){
   Swal.fire({
     title: '你确定删除吗？',
     showCancelButton: true,
@@ -32,7 +33,7 @@ function DeleteAPI(dosomething){
     cancelButtonText: "取消"
   }).then((result) => {
     if (result.isConfirmed) {
-      dosomething();
+      //
       Swal.fire({
         title:'删除成功', 
         icon:'success',

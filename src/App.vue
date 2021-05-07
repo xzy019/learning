@@ -3,14 +3,15 @@
 </template>
 
 <script>
-import {defineComponent, ref, reactive, toRefs} from 'vue'
+import {defineComponent, ref, reactive, toRefs, getCurrentInstance} from 'vue'
 export default defineComponent({
   components: {
   },
-  setup(props, ctx){
+  setup(props){
     return{
+      
     }
-  }
+  },
 })
 </script>
 

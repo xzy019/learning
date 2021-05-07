@@ -6,7 +6,7 @@
           <img class="el-avatar" :src="imgUrl" />
           <p>
             <i 
-              v-if="sex==='男'"
+              v-if="sex===0"
               class="fa fa-mars" 
               style="color: white;
                     display: inline-block;
@@ -18,7 +18,7 @@
                     "
             ></i>
             <i 
-              v-if="sex==='女'"
+              v-if="sex===1"
               class="fa fa-venus" 
               style="color: white;
                     display: inline-block;
@@ -49,8 +49,8 @@
           </div>
         </div>
         <div style="text-align:center;">
-          <Button :msg="'写笔记'" :icon="'fa fa-edit'" :bcolor="'#a2d5f2'"/>
-          <Button :msg="'写计划'" :icon="'fa fa-edit'" :bcolor="'#ffda77'"/>
+          <Button @click="toLink1('/edit')" :msg="'写笔记'" :icon="'fa fa-edit'" :bcolor="'#a2d5f2'"/>
+          <Button @click="toLink2()" :msg="'写计划'" :icon="'fa fa-edit'" :bcolor="'#ffda77'"/>
         </div>
         <div class="center">
           <ul class="center_menu">
@@ -90,20 +90,36 @@
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue'
 import Button from '@/components/Button.vue'
-import {defineComponent, reactive, ref} from 'vue'
+import {defineComponent, reactive, ref, getCurrentInstance} from 'vue'
+import Writer from '../lib/API/WriterAPI'
 export default defineComponent({
   name: 'Home',
   components: {
     Button
   },
   setup(){
-    let awidth = ref(true);
-    let num = ref(5);
+    const {ctx} = getCurrentInstance();
+    let routerpath = ctx.$router.currentRoute.value.path;
+    let num = ref(4);
     let bgcolor = ref('#e6e6e6');
+    let awidth = ref(true);
     let username = ref("Li Ming");
-    let sex = ref("男");
+    let sex = ref(0);
     let imgUrl = ref(require('../assets/logo.png'));
     let search_text = ref('');
+    let toLink1 = function(path){
+      let link = ctx.$router.resolve({
+        path: path
+      });
+      window.open(link.href, '_blank')
+    };
+    let toLink2 = function(){
+      ctx.$router.push({
+        path: '/list'
+      });
+      num.value = 2;
+      bgcolor.value = '#ffda77';
+    };
     let list = reactive([
       {
         path:'/self',
@@ -138,14 +154,18 @@ export default defineComponent({
       num.value = index;
       bgcolor.value = list[index].color;
     }
-    let search = ()=>{
-      this.$axios({
-        url:'',
-        param:{
-          text: search_text.value
-        }
-      })
-    }
+    if(routerpath ==='/self') {num.value = 0;bgcolor.value = '#ff5964';}
+    if(routerpath ==='/note') {num.value = 1;bgcolor.value = '#a2d5f2';}
+    if(routerpath ==='/list') {num.value = 2;bgcolor.value = '#ffda77';}
+    if(routerpath ==='/study') {num.value = 3;bgcolor.value = '#1bd1a5';}
+    Writer.getWriter().
+    then(res=>{
+      console.log(res.data);
+      username.value = res.data.data.nickName;
+      sex.value = res.data.data.sex;
+    })
+    
+    
     return{
       awidth,
       showBar,
@@ -156,9 +176,11 @@ export default defineComponent({
       username,
       sex,
       imgUrl,
-      search_text
+      search_text,
+      toLink1,
+      toLink2
     }
-  }
+  },
 })
 </script>
 

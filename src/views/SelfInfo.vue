@@ -55,20 +55,30 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive, toRefs } from "vue";
+import { defineComponent, ref, reactive, toRefs, getCurrentInstance } from "vue";
 import Button from "@/components/Button.vue";
 import SelfNote from "@/components/selfNote.vue";
+import Writer from '../lib/API/WriterAPI'
+import swal from '../lib/swal'
 export default defineComponent({
   name: "",
   components: {
     Button,
     SelfNote
   },
-  setup(props, ctx) {
+  setup(props) {
+    const {ctx} = getCurrentInstance();
     let self = reactive({
       nickname: "星光",
       sex: "男",
       telnumber: "12345678910",
+    });
+    Writer.getWriter().then(res=>{
+      console.log(res.data.data);
+      self.telnumber = res.data.data.telNumber;
+      self.nickname = res.data.data.nickName;
+      if(res.data.data.sex === 0) self.sex = '男';
+      if(res.data.data.sex === 1) self.sex = '女';
     });
     let edit = ref(false);
     let btnedit = ref(false);
@@ -78,13 +88,23 @@ export default defineComponent({
     let hiddenedit = () => {
       btnedit.value = false;
     };
+    let onSubmit = function(){
+      Writer.editWriter(self.nickname,self.sex,self.telnumber)
+      .then(res=>{
+        if(res.data.code === 200) swal.Success('修改成功');
+        ctx.$router.go(0);
+      })
+      
+    }
+
     return {
       self,
       edit,
       btnedit,
       showedit,
       hiddenedit,
-      activeName: ref('first')
+      activeName: ref('first'),
+      onSubmit
     };
   },
 });
